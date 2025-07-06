@@ -1,0 +1,18 @@
+# Memory Load/Store Operations Example
+# Demonstrates data memory access patterns
+
+# Initialize base address and data
+01400093
+02000113
+00064123
+00A00193
+
+# Store operations
+003120A3
+002121A3
+001122A3
+
+# Load operations  
+0000A203
+0040A283
+0080A303

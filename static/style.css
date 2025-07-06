@@ -1,0 +1,275 @@
+/* Custom styles for RISC-V Visualizer */
+
+:root {
+    --cyber-purple: #6366f1;
+    --cyber-pink: #ec4899;
+    --cyber-blue: #06b6d4;
+    --cyber-green: #10b981;
+    --cyber-orange: #f59e0b;
+    --dark-bg: #0f0f23;
+    --dark-card: #1a1a2e;
+    --dark-accent: #16213e;
+}
+
+.pipeline-stage {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.pipeline-stage::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.pipeline-stage:hover::before {
+    left: 100%;
+}
+
+.pipeline-stage:hover {
+    transform: translateY(-4px) scale(1.02);
+}
+
+.register-cell {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.6));
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.register-cell:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.1)) !important;
+    border-color: var(--cyber-purple);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+}
+
+.register-cell.changed {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.7)) !important;
+    color: rgb(15, 23, 42) !important;
+    border-color: var(--cyber-orange);
+    animation: register-flash 0.8s ease-in-out;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+}
+
+.register-cell:nth-child(1) {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(99, 102, 241, 0.1));
+    border-color: var(--cyber-purple);
+}
+
+@keyframes register-flash {
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+}
+
+.memory-cell {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.6));
+    border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.memory-cell:hover {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(16, 185, 129, 0.1)) !important;
+    border-color: var(--cyber-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(6, 182, 212, 0.3);
+}
+
+.memory-cell.changed {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(34, 197, 94, 0.7)) !important;
+    color: rgb(15, 23, 42) !important;
+    border-color: var(--cyber-green);
+    animation: memory-pulse 0.8s ease-in-out;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+}
+
+@keyframes memory-pulse {
+    0%, 100% { 
+        opacity: 1;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+    }
+    50% { 
+        opacity: 0.9;
+        box-shadow: 0 0 30px rgba(16, 185, 129, 0.8);
+    }
+}
+
+/* Glow effects for active states */
+.active-signal {
+    background: linear-gradient(45deg, var(--cyber-green), var(--cyber-blue)) !important;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.8);
+    animation: signal-glow 1s ease-in-out infinite alternate;
+}
+
+@keyframes signal-glow {
+    0% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.8); }
+    100% { box-shadow: 0 0 25px rgba(16, 185, 129, 1); }
+}
+
+/* Enhanced button effects */
+button {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+button:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Cyber grid background */
+.cyber-grid {
+    background-image: 
+        linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* Pipeline flow animation */
+@keyframes pipeline-flow {
+    0% { transform: translateX(-100%); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateX(100%); opacity: 0; }
+}
+
+/* Custom Range Slider Styling */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-track {
+    background: linear-gradient(90deg, var(--cyber-orange), var(--cyber-pink));
+    height: 4px;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cyber-orange), var(--cyber-pink));
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+    transition: all 0.3s ease;
+    border: 2px solid white;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+}
+
+input[type="range"]::-moz-range-track {
+    background: linear-gradient(90deg, var(--cyber-orange), var(--cyber-pink));
+    height: 4px;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+    border: none;
+}
+
+input[type="range"]::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cyber-orange), var(--cyber-pink));
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+    transition: all 0.3s ease;
+    border: 2px solid white;
+    cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+}
+
+.pipeline-flow-indicator {
+    animation: pipeline-flow 2s ease-in-out infinite;
+}
+
+/* Loading animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgb(51, 65, 85);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(100, 116, 139);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(148, 163, 184);
+}
+
+/* Custom button styles */
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button:disabled:hover {
+    background-color: inherit !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1279px) {
+    .pipeline-stage {
+        min-height: 120px;
+    }
+}
+
+@media (max-width: 768px) {
+    .grid-cols-8 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .grid-cols-5 {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}

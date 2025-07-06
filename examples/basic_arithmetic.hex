@@ -1,0 +1,18 @@
+# Basic Arithmetic Operations Example
+# This demonstrates fundamental RISC-V arithmetic instructions
+
+# Initialize some values in registers
+00A00093
+00500113
+00F00193
+
+# Basic arithmetic operations
+002081B3
+40208233
+002092B3
+0020A333
+
+# Immediate arithmetic
+00508393
+FFF08413
+00A0A493

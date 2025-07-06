@@ -1,0 +1,525 @@
+{% extends "base.html" %}
+
+{% block title %}RISC-V Visualizer{% endblock %}
+
+{% block content %}
+
+        <!-- Main Layout -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <!-- Control Panel -->
+            <div class="xl:col-span-1">
+                <div class="bg-gradient-to-br from-dark-card to-dark-accent rounded-2xl p-6 border border-cyber-purple/30 shadow-2xl backdrop-blur-sm">
+                    <div class="flex items-center space-x-2 mb-6">
+                        <div class="w-3 h-3 bg-cyber-purple rounded-full animate-pulse"></div>
+                        <h2 class="text-xl font-semibold bg-gradient-to-r from-cyber-purple to-cyber-pink bg-clip-text text-transparent">Control Panel</h2>
+                        <div class="w-3 h-3 bg-cyber-pink rounded-full animate-pulse"></div>
+                    </div>
+                    
+                    <!-- Instructions Input -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-cyber-blue mb-3 flex items-center">
+                            <span class="w-2 h-2 bg-cyber-blue rounded-full mr-2"></span>
+                            Assembly Instructions
+                        </label>
+                        <textarea 
+                            id="instructionsInput"
+                            class="w-full h-40 bg-gradient-to-br from-slate-800 to-slate-700 border-2 border-cyber-purple/20 rounded-xl px-4 py-3 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyber-purple focus:border-cyber-purple/50 font-mono text-sm transition-all duration-300 shadow-inner"
+                            placeholder="Enter RISC-V assembly or hex instructions...
+
+🔥 Examples:
+00C88693  // addi x13, x17, 12
+003102B3  // add x5, x2, x3  
+0042A213  // slti x4, x5, 4
+0064C383  // lw x7, 6(x9)
+00B52C23  // sw x11, 8(x10)"
+                        >00C88693
+003102B3
+0042A213
+0064C383
+00B52C23</textarea>
+                    </div>
+
+                    <!-- Example Programs -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-cyber-green mb-3 flex items-center">
+                            <span class="w-2 h-2 bg-cyber-green rounded-full mr-2"></span>
+                            Example Programs
+                        </label>
+                        <select 
+                            id="exampleSelect"
+                            class="w-full bg-gradient-to-r from-slate-800 to-slate-700 border-2 border-cyber-green/20 rounded-xl px-4 py-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-cyber-green focus:border-cyber-green/50 transition-all duration-300 mb-3"
+                        >
+                            <option value="">🎯 Choose an example...</option>
+                            <option value="tutorial_program">📚 Complete Tutorial (Recommended)</option>
+                            <option value="basic_arithmetic">➕ Basic Arithmetic (ADD, SUB, SLT)</option>
+                            <option value="memory_operations">💾 Memory Operations (LW, SW)</option>
+                            <option value="logical_operations">🔧 Logical Operations (AND, OR, XOR)</option>
+                            <option value="branch_control">🔀 Branch Control (BEQ, BNE)</option>
+                        </select>
+                        <button 
+                            id="loadExampleBtn"
+                            class="w-full bg-gradient-to-r from-cyber-green to-emerald-500 hover:from-emerald-500 hover:to-cyber-green text-white font-semibold py-2 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
+                            disabled
+                        >
+                            📂 Load Selected Example
+                        </button>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-cyber-orange mb-3 flex items-center">
+                            <span class="w-2 h-2 bg-cyber-orange rounded-full mr-2"></span>
+                            Or Upload Custom File
+                        </label>
+                        <input 
+                            type="file" 
+                            id="fileInput"
+                            accept=".hex,.txt"
+                            class="w-full bg-gradient-to-r from-slate-800 to-slate-700 border-2 border-cyber-orange/20 rounded-xl px-4 py-3 text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-cyber-orange file:to-amber-500 file:text-white hover:file:from-amber-500 hover:file:to-cyber-orange transition-all duration-300"
+                        >
+                    </div>
+
+                    <!-- Execution Mode Selection -->
+                    <div class="mb-6 p-4 bg-gradient-to-r from-slate-800 to-slate-700 rounded-xl border border-cyber-purple/20">
+                        <h3 class="text-sm font-medium text-cyber-purple mb-3 flex items-center">
+                            <span class="w-2 h-2 bg-cyber-purple rounded-full mr-2"></span>
+                            Execution Mode
+                        </h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="radio" name="executionMode" value="manual" checked class="text-cyber-purple focus:ring-cyber-purple">
+                                <span class="text-gray-200">🎯 Manual Step-by-Step</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="radio" name="executionMode" value="auto" class="text-cyber-purple focus:ring-cyber-purple">
+                                <span class="text-gray-200">⚡ Automatic with Speed Control</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Speed Control (Auto Mode) -->
+                    <div id="speedControl" class="mb-6 p-4 bg-gradient-to-r from-slate-800 to-slate-700 rounded-xl border border-cyber-orange/20 hidden">
+                        <h3 class="text-sm font-medium text-cyber-orange mb-3 flex items-center">
+                            <span class="w-2 h-2 bg-cyber-orange rounded-full mr-2"></span>
+                            Execution Speed
+                        </h3>
+                        <div class="space-y-3">
+                            <input 
+                                type="range" 
+                                id="speedSlider" 
+                                min="1" 
+                                max="10" 
+                                value="5" 
+                                class="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer"
+                            >
+                            <div class="flex justify-between text-xs text-gray-400">
+                                <span>🐌 Slow (1s)</span>
+                                <span id="speedDisplay" class="text-cyber-orange font-semibold">Medium (0.5s)</span>
+                                <span>🚀 Fast (0.1s)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Control Buttons -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <button 
+                            id="runBtn"
+                            class="bg-gradient-to-r from-cyber-purple to-cyber-pink hover:from-cyber-pink hover:to-cyber-purple text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-cyber-purple/50 flex items-center justify-center space-x-2"
+                        >
+                            <span>▶</span>
+                            <span>Run Simulation</span>
+                        </button>
+                        <button 
+                            id="resetBtn"
+                            class="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2"
+                        >
+                            <span>↻</span>
+                            <span>Reset</span>
+                        </button>
+                    </div>
+
+                    <!-- Auto Mode Controls -->
+                    <div id="autoControls" class="grid grid-cols-2 gap-4 mb-6 hidden">
+                        <button 
+                            id="playBtn"
+                            class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-300 disabled:opacity-50 flex items-center justify-center space-x-2"
+                            disabled
+                        >
+                            <span>▶️</span>
+                            <span>Play</span>
+                        </button>
+                        <button 
+                            id="pauseBtn"
+                            class="bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-300 disabled:opacity-50 hidden flex items-center justify-center space-x-2"
+                            disabled
+                        >
+                            <span>⏸️</span>
+                            <span>Pause</span>
+                        </button>
+                    </div>
+
+                    <!-- Cycle Control -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-cyber-orange mb-3 flex items-center">
+                            <span class="w-2 h-2 bg-cyber-orange rounded-full mr-2"></span>
+                            Cycle Control
+                        </label>
+                        <div class="bg-gradient-to-r from-slate-800/50 to-slate-700/50 rounded-xl p-4 border border-cyber-orange/20">
+                            <div class="flex items-center justify-between space-x-3">
+                                <button 
+                                    id="prevCycleBtn"
+                                    class="bg-gradient-to-r from-cyber-orange to-amber-500 hover:from-amber-500 hover:to-cyber-orange text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
+                                    disabled
+                                >
+                                    ← Prev
+                                </button>
+                                <div class="flex-1 text-center">
+                                    <div id="cycleDisplay" class="text-cyber-orange font-mono text-lg font-bold bg-slate-900/50 rounded-lg py-2 px-4">
+                                        Cycle: 0
+                                    </div>
+                                </div>
+                                <button 
+                                    id="nextCycleBtn"
+                                    class="bg-gradient-to-r from-cyber-orange to-amber-500 hover:from-amber-500 hover:to-cyber-orange text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
+                                    disabled
+                                >
+                                    Next →
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status Panel -->
+                    <div id="statusPanel" class="mb-6">
+                        <div class="bg-gradient-to-r from-slate-800/50 to-slate-700/50 rounded-xl p-4 border border-cyber-blue/20">
+                            <h3 class="text-sm font-medium text-cyber-blue mb-3 flex items-center">
+                                <span class="w-2 h-2 bg-cyber-blue rounded-full mr-2"></span>
+                                Processor Status
+                            </h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400 text-sm">Program Counter:</span>
+                                    <span id="pcValue" class="text-cyber-blue font-mono font-bold">0x00000000</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400 text-sm">Pipeline State:</span>
+                                    <span id="pipelineState" class="text-cyber-green font-semibold">Ready</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400 text-sm">Clock Frequency:</span>
+                                    <span class="text-cyber-pink font-mono font-bold">100 MHz</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Processor Statistics -->
+                    <div id="statsPanel" class="mb-6">
+                        <div class="bg-gradient-to-r from-slate-800/50 to-slate-700/50 rounded-xl p-4 border border-cyber-green/20">
+                            <h3 class="text-sm font-medium text-cyber-green mb-3 flex items-center">
+                                <span class="w-2 h-2 bg-cyber-green rounded-full mr-2"></span>
+                                Performance Statistics
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4 text-xs">
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-400">Instructions:</span>
+                                        <span id="statInstructions" class="text-cyber-green font-mono font-bold">0</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-400">Cycles:</span>
+                                        <span id="statCycles" class="text-cyber-green font-mono font-bold">0</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-400">CPI:</span>
+                                        <span id="statCPI" class="text-cyber-green font-mono font-bold">0.00</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-400">Hazards:</span>
+                                        <span id="statHazards" class="text-yellow-400 font-mono font-bold">0</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-400">Stalls:</span>
+                                        <span id="statStalls" class="text-red-400 font-mono font-bold">0</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-400">IPC:</span>
+                                        <span id="statIPC" class="text-cyber-blue font-mono font-bold">0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="loadingState" class="hidden text-center py-6">
+                        <div class="relative">
+                            <div class="animate-spin rounded-full h-12 w-12 border-4 border-cyber-purple/20 border-t-cyber-purple mx-auto mb-4"></div>
+                            <div class="absolute inset-0 rounded-full h-12 w-12 border-4 border-transparent border-t-cyber-pink animate-spin mx-auto" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+                        </div>
+                        <p class="text-cyber-purple font-semibold animate-pulse">🚀 Running simulation...</p>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="errorState" class="hidden bg-gradient-to-r from-red-900/50 to-pink-900/50 border-2 border-red-500/50 rounded-xl p-4 backdrop-blur-sm">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="text-red-400">⚠️</span>
+                            <span class="text-red-300 font-semibold">Error</span>
+                        </div>
+                        <p class="text-red-200 text-sm" id="errorMessage"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization Panel -->
+            <div class="xl:col-span-2">
+                <!-- Pipeline Stages -->
+                <div class="bg-gradient-to-br from-dark-card to-dark-accent rounded-2xl p-6 border border-cyber-blue/30 shadow-2xl backdrop-blur-sm mb-6">
+                    <div class="flex items-center space-x-2 mb-6">
+                        <div class="w-3 h-3 bg-cyber-blue rounded-full animate-pulse"></div>
+                        <h3 class="text-xl font-semibold bg-gradient-to-r from-cyber-blue to-cyber-green bg-clip-text text-transparent">5-Stage Pipeline</h3>
+                        <div class="w-3 h-3 bg-cyber-green rounded-full animate-pulse"></div>
+                    </div>
+                    
+                    <!-- Pipeline Flow Visualization -->
+                    <div class="relative mb-6">
+                        <div class="flex items-center justify-center space-x-2 mb-4">
+                            <div class="h-1 bg-gradient-to-r from-cyber-purple to-cyber-pink rounded-full flex-1"></div>
+                            <span class="text-xs text-gray-400 px-2">Instruction Flow</span>
+                            <div class="h-1 bg-gradient-to-r from-cyber-pink to-cyber-blue rounded-full flex-1"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <!-- IF Stage -->
+                        <div class="pipeline-stage bg-gradient-to-br from-cyber-purple/20 to-cyber-purple/10 border-2 border-cyber-purple/30 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:shadow-cyber-purple/20">
+                            <div class="flex items-center justify-center mb-3">
+                                <div class="w-8 h-8 bg-gradient-to-r from-cyber-purple to-purple-400 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-sm">IF</span>
+                                </div>
+                            </div>
+                            <h4 class="text-cyber-purple font-bold mb-3 text-center text-sm">Instruction Fetch</h4>
+                            <div class="space-y-2 text-xs">
+                                <div class="bg-slate-900/50 rounded-lg p-2">
+                                    <div class="text-gray-400 mb-1">PC:</div>
+                                    <div id="if-pc" class="text-cyber-purple font-mono font-bold">0x00000000</div>
+                                </div>
+                                <div class="bg-slate-900/50 rounded-lg p-2">
+                                    <div class="text-gray-400 mb-1">Instruction:</div>
+                                    <div id="if-instr" class="text-white font-mono text-xs break-all">00000013</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- ID Stage -->
+                        <div class="pipeline-stage bg-gradient-to-br from-cyber-pink/20 to-cyber-pink/10 border-2 border-cyber-pink/30 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:shadow-cyber-pink/20">
+                            <div class="flex items-center justify-center mb-3">
+                                <div class="w-8 h-8 bg-gradient-to-r from-cyber-pink to-pink-400 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-sm">ID</span>
+                                </div>
+                            </div>
+                            <h4 class="text-cyber-pink font-bold mb-3 text-center text-sm">Instruction Decode</h4>
+                            <div class="space-y-2 text-xs">
+                                <div class="bg-slate-900/50 rounded-lg p-2">
+                                    <div class="text-gray-400 mb-1">PC:</div>
+                                    <div id="id-pc" class="text-cyber-pink font-mono font-bold">0x00000000</div>
+                                </div>
+                                <div class="bg-slate-900/50 rounded-lg p-2">
+                                    <div class="text-gray-400 mb-1">Instruction:</div>
+                                    <div id="id-instr" class="text-white font-mono text-xs break-all">00000013</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- EX Stage -->
+                        <div class="pipeline-stage bg-gradient-to-br from-cyber-blue/20 to-cyber-blue/10 border-2 border-cyber-blue/30 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:shadow-cyber-blue/20">
+                            <div class="flex items-center justify-center mb-3">
+                                <div class="w-8 h-8 bg-gradient-to-r from-cyber-blue to-blue-400 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-sm">EX</span>
+                                </div>
+                            </div>
+                            <h4 class="text-cyber-blue font-bold mb-3 text-center text-sm">Execute </h4>
+                            <div class="space-y-2 text-xs">
+                                <div class="bg-slate-900/50 rounded-lg p-2">
+                                    <div class="text-gray-400 mb-1">PC:</div>
+                                    <div id="ex-pc" class="text-cyber-blue font-mono font-bold">0x00000000</div>
+                                </div>
+                                <div class="bg-slate-900/50 rounded-lg p-2">
+                                    <div class="text-gray-400 mb-1">ALU Result:</div>
+                                    <div id="ex-alu" class="text-white font-mono text-xs">0x00000000</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- MEM Stage -->
+                        <div class="pipeline-stage bg-gradient-to-br from-cyber-green/20 to-cyber-green/10 border-2 border-cyber-green/30 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:shadow-cyber-green/20">
+                            <div class="flex items-center justify-center mb-3">
+                                <div class="w-8 h-8 bg-gradient-to-r from-cyber-green to-green-400 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-sm">MEM</span>
+                                </div>
+                            </div>
+                            <h4 class="text-cyber-green font-bold mb-3 text-center text-sm">Memory Access</h4>
+                            <div class="space-y-2 text-xs">
+                                <div class="bg-slate-900/50 rounded-lg p-2">
+                                    <div class="text-gray-400 mb-1">PC:</div>
+                                    <div id="mem-pc" class="text-cyber-green font-mono font-bold">0x00000000</div>
+                                </div>
+                                <div class="bg-slate-900/50 rounded-lg p-2">
+                                    <div class="text-gray-400 mb-1">Memory Data:</div>
+                                    <div id="mem-data" class="text-white font-mono text-xs">0x00000000</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- WB Stage -->
+                        <div class="pipeline-stage bg-gradient-to-br from-cyber-orange/20 to-cyber-orange/10 border-2 border-cyber-orange/30 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:shadow-cyber-orange/20">
+                            <div class="flex items-center justify-center mb-3">
+                                <div class="w-8 h-8 bg-gradient-to-r from-cyber-orange to-orange-400 rounded-full flex items-center justify-center">
+                                    <span class="text-white font-bold text-sm">WB</span>
+                                </div>
+                            </div>
+                            <h4 class="text-cyber-orange font-bold mb-3 text-center text-sm">Write Back</h4>
+                            <div class="space-y-2 text-xs">
+                                <div class="bg-slate-900/50 rounded-lg p-2">
+                                    <div class="text-gray-400 mb-1">PC:</div>
+                                    <div id="wb-pc" class="text-cyber-orange font-mono font-bold">0x00000000</div>
+                                </div>
+                                <div class="bg-slate-900/50 rounded-lg p-2">
+                                    <div class="text-gray-400 mb-1">Write Data:</div>
+                                    <div id="wb-result" class="text-white font-mono text-xs">0x00000000</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Register File -->
+                <div class="bg-gradient-to-br from-dark-card to-dark-accent rounded-2xl p-6 border border-cyber-green/30 shadow-2xl backdrop-blur-sm mb-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-cyber-green rounded-full animate-pulse"></div>
+                            <h3 class="text-xl font-semibold bg-gradient-to-r from-cyber-green to-cyber-blue bg-clip-text text-transparent">Register File (32 x 32-bit)</h3>
+                        </div>
+                        <div class="text-xs text-gray-400 bg-slate-900/50 rounded-lg px-3 py-1">
+                            💾 General Purpose Registers
+                        </div>
+                    </div>
+                    
+                    <!-- Register Legend -->
+                    <div class="grid grid-cols-4 gap-2 mb-4 text-xs">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-cyber-green rounded"></div>
+                            <span class="text-gray-400">Normal</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-cyber-orange rounded"></div>
+                            <span class="text-gray-400">Modified</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-cyber-purple rounded"></div>
+                            <span class="text-gray-400">Zero (x0)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-cyber-pink rounded"></div>
+                            <span class="text-gray-400">Special</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-4 sm:grid-cols-8 gap-3" id="registerGrid">
+                        <!-- Registers will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Memory View -->
+                <div class="bg-gradient-to-br from-dark-card to-dark-accent rounded-2xl p-6 border border-cyber-orange/30 shadow-2xl backdrop-blur-sm mb-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-cyber-orange rounded-full animate-pulse"></div>
+                            <h3 class="text-xl font-semibold bg-gradient-to-r from-cyber-orange to-cyber-pink bg-clip-text text-transparent">Data Memory</h3>
+                        </div>
+                        <div class="text-xs text-gray-400 bg-slate-900/50 rounded-lg px-3 py-1">
+                            🗄️ First 16 Words
+                        </div>
+                    </div>
+                    
+                    <!-- Memory Legend -->
+                    <div class="grid grid-cols-3 gap-2 mb-4 text-xs">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-slate-600 rounded"></div>
+                            <span class="text-gray-400">Empty</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-cyber-blue rounded"></div>
+                            <span class="text-gray-400">Data</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-cyber-green rounded"></div>
+                            <span class="text-gray-400">Modified</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs" id="memoryGrid">
+                        <!-- Memory will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Control Signals Panel -->
+                <div class="bg-gradient-to-br from-dark-card to-dark-accent rounded-2xl p-6 border border-cyber-pink/30 shadow-2xl backdrop-blur-sm">
+                    <div class="flex items-center space-x-2 mb-6">
+                        <div class="w-3 h-3 bg-cyber-pink rounded-full animate-pulse"></div>
+                        <h3 class="text-xl font-semibold bg-gradient-to-r from-cyber-pink to-cyber-purple bg-clip-text text-transparent">Control Signals</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div class="bg-slate-900/50 rounded-xl p-3">
+                            <div class="text-xs text-gray-400 mb-1">RegWrite</div>
+                            <div class="flex items-center space-x-2">
+                                <div id="regwrite-indicator" class="w-3 h-3 bg-gray-600 rounded-full"></div>
+                                <span id="regwrite-value" class="text-sm text-gray-300">0</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-xl p-3">
+                            <div class="text-xs text-gray-400 mb-1">MemRead</div>
+                            <div class="flex items-center space-x-2">
+                                <div id="memread-indicator" class="w-3 h-3 bg-gray-600 rounded-full"></div>
+                                <span id="memread-value" class="text-sm text-gray-300">0</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-xl p-3">
+                            <div class="text-xs text-gray-400 mb-1">MemWrite</div>
+                            <div class="flex items-center space-x-2">
+                                <div id="memwrite-indicator" class="w-3 h-3 bg-gray-600 rounded-full"></div>
+                                <span id="memwrite-value" class="text-sm text-gray-300">0</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-xl p-3">
+                            <div class="text-xs text-gray-400 mb-1">Branch</div>
+                            <div class="flex items-center space-x-2">
+                                <div id="branch-indicator" class="w-3 h-3 bg-gray-600 rounded-full"></div>
+                                <span id="branch-value" class="text-sm text-gray-300">0</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-xl p-3">
+                            <div class="text-xs text-gray-400 mb-1">ALUSrc</div>
+                            <div class="flex items-center space-x-2">
+                                <div id="alusrc-indicator" class="w-3 h-3 bg-gray-600 rounded-full"></div>
+                                <span id="alusrc-value" class="text-sm text-gray-300">0</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-xl p-3">
+                            <div class="text-xs text-gray-400 mb-1">MemtoReg</div>
+                            <div class="flex items-center space-x-2">
+                                <div id="memtoreg-indicator" class="w-3 h-3 bg-gray-600 rounded-full"></div>
+                                <span id="memtoreg-value" class="text-sm text-gray-300">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+{% endblock %}

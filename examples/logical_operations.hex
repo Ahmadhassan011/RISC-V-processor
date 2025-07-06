@@ -1,0 +1,23 @@
+# Logical Operations Example
+# Demonstrates bitwise and logical operations
+
+# Initialize test values
+00F00093
+0A000113  
+FF000193
+
+# Bitwise operations
+002091B3
+0020E233
+0020C2B3
+0020F333
+
+# Shift operations  
+00209393
+40209413
+00211493
+
+# Immediate logical operations
+0A00C513
+FF00E593
+0F00F613

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RISC-V Processor{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cyber-purple': '#6366f1',
+                        'cyber-pink': '#ec4899',
+                        'cyber-blue': '#06b6d4',
+                        'cyber-green': '#10b981',
+                        'cyber-orange': '#f59e0b',
+                        'dark-bg': '#0f0f23',
+                        'dark-card': '#1a1a2e',
+                        'dark-accent': '#16213e'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-gradient-to-br from-dark-bg via-slate-900 to-dark-accent text-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header -->
+        <header class="mb-8 text-center">
+            <h1 class="text-5xl font-bold bg-gradient-to-r from-cyber-purple via-cyber-pink to-cyber-blue bg-clip-text text-transparent mb-4">
+                <a href="/">RISC-V Processor</a>
+            </h1>
+            <div class="flex items-center justify-center space-x-4 mb-4">
+                <div class="h-1 w-16 bg-gradient-to-r from-cyber-purple to-cyber-pink rounded"></div>
+                <p class="text-lg text-gray-300">Interactive 5-stage pipeline processor simulation</p>
+                <div class="h-1 w-16 bg-gradient-to-r from-cyber-pink to-cyber-blue rounded"></div>
+            </div>
+            <nav class="max-w-md mx-auto bg-dark-card/50 rounded-xl p-2 border border-cyber-purple/30 backdrop-blur-sm">
+                <ul class="flex justify-around items-center font-semibold">
+                    <li><a href="{{ url_for('index') }}" class="px-4 py-2 rounded-lg hover:bg-cyber-purple/20 transition-colors duration-300">Visualizer</a></li>
+                    <li><a href="{{ url_for('guide') }}" class="px-4 py-2 rounded-lg hover:bg-cyber-purple/20 transition-colors duration-300">Guide</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

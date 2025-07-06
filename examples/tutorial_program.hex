@@ -1,0 +1,25 @@
+# Tutorial: Complete RISC-V Program Example
+# This program demonstrates a comprehensive set of RISC-V operations
+
+# Step 1: Initialize registers with test values
+00A00093  # addi x1, x0, 10     | Load 10 into x1
+00500113  # addi x2, x0, 5      | Load 5 into x2  
+00300193  # addi x3, x0, 3      | Load 3 into x3
+01400213  # addi x4, x0, 20     | Load 20 into x4 (memory base)
+
+# Step 2: Arithmetic operations
+002081B3  # add x3, x1, x2      | x3 = x1 + x2 = 15
+40208233  # sub x4, x1, x2      | x4 = x1 - x2 = 5
+00209293  # sll x5, x1, x2      | x5 = x1 << x2 (shift left)
+0020A313  # slt x6, x1, x2      | x6 = (x1 < x2) ? 1 : 0
+
+# Step 3: Immediate operations  
+00508393  # addi x7, x1, 5      | x7 = x1 + 5 = 15
+00C0C413  # xori x8, x1, 12     | x8 = x1 XOR 12
+00F0E493  # ori x9, x1, 15      | x9 = x1 OR 15
+
+# Step 4: Memory operations
+00412023  # sw x4, 0(x2)        | Store x4 to memory[x2+0]
+00112223  # sw x1, 4(x2)        | Store x1 to memory[x2+4]  
+00012503  # lw x10, 0(x2)       | Load from memory[x2+0] to x10
+00412583  # lw x11, 4(x2)       | Load from memory[x2+4] to x11
